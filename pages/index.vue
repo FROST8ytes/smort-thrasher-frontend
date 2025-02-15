@@ -73,10 +73,11 @@ watch(color, () => {
           index="name"
           :category="'total'"
           :data="data"
+          class="md:max-h-[250px]"
         />
       </CardContent>
     </Card>
-    <Card class="aspect-video rounded-xl bg-muted/50 col-span-2">
+    <Card class="aspect-[32/9] rounded-xl bg-muted/50 col-span-2">
       <CardHeader>
         <CardTitle>Deez Nuts</CardTitle>
       </CardHeader>
@@ -85,6 +86,7 @@ watch(color, () => {
           index="name"
           :data="data"
           :categories="['total', 'predicted']"
+          class="md:h-48 md:max-h-[250px] pb-4"
         />
       </CardContent>
     </Card>
