@@ -14,6 +14,22 @@ const {data: binDetails} = await useFetch(() => `http://45.118.132.167/sensor/${
 
 const {data: binTrashLevel} = await useFetch(() => `http://45.118.132.167/sensor/${binId.value}/record`);
 
+const {data: binAllTrashLevels} = await useFetch(() => `http://45.118.132.167/sensor/${binId.value}/records`);
+
+const tableData = computed(() => {
+  const data = [];
+
+  binAllTrashLevels.value.slice(-4).reverse().forEach(level => {
+    data.push({
+      id: level[0],
+      timestamp: new Date(level[1]),
+      trash_level: level[2],
+      image: level[3],
+    });
+  });
+  return data;
+});
+
 const invoices = [
   {
     invoice: 'INV001',
@@ -58,10 +74,6 @@ const invoices = [
     paymentMethod: 'Credit Card',
   },
 ];
-
-onUpdated(() => {
-  document.querySelectorAll("div:empty").forEach((el) => el.remove());
-});
 </script>
 
 <template>
@@ -76,25 +88,26 @@ onUpdated(() => {
           <TableCaption>History of trash level in Trash #{{ binId }}</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead class="w-[100px]">
-                Invoice
+              <TableHead>
+                Timestamp
               </TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Method</TableHead>
+              <TableHead class="w-[23rem]">Trash Level</TableHead>
               <TableHead class="text-right">
-                Amount
+                Image
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-for="invoice in invoices" :key="invoice.invoice">
+            <TableRow v-for="row in tableData" :key="row.id">
               <TableCell class="font-medium">
-                {{ invoice.invoice }}
+                {{ row.timestamp }}
               </TableCell>
-              <TableCell>{{ invoice.paymentStatus }}</TableCell>
-              <TableCell>{{ invoice.paymentMethod }}</TableCell>
+              <TableCell>{{ row.trash_level }}</TableCell>
               <TableCell class="text-right">
-                {{ invoice.totalAmount }}
+                <NuxtImg v-if="row.image" :src="`data:iamge/jpeg;base64,${row.image}`"
+                         alt="trash image"
+                         class="aspect-video max-w-[150px] rounded-md"/>
+                <Skeleton v-else class="aspect-video max-w-[150px]"/>
               </TableCell>
             </TableRow>
           </TableBody>
