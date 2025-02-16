@@ -17,6 +17,7 @@ import {
 import lodash from "lodash";
 
 import {signOut} from "firebase/auth";
+import {useToast} from "@/components/ui/toast/use-toast";
 
 import {useLocationStore} from "@/stores/location";
 import {storeToRefs} from "pinia";
@@ -36,10 +37,12 @@ const data = {
   ],
 };
 
+const predictSensorId = ref(1);
 const auth = useFirebaseAuth()!;
 const user = useCurrentUser();
 const router = useRouter();
 const route = useRoute();
+const {toast} = useToast();
 
 const locationStore = useLocationStore();
 const {activeLocationId: activeLocation} = storeToRefs(locationStore);
@@ -69,6 +72,14 @@ watch(activeLocation, async (id) => {
 
 function handleSignOut() {
   signOut(auth).then(() => router.replace("/login"));
+}
+
+async function getPredictionValue() {
+  const {data: predictionValue} = await useFetch(() => `http://45.118.132.167/predict/${predictSensorId.value}`);
+  toast({
+    title: "Predicted Value",
+    description: `The trash will be full in ${predictionValue.value.hours_until_full} hours. The trash level will be at ${predictionValue.value.predicted_level}%.`,
+  });
 }
 </script>
 
@@ -264,7 +275,43 @@ function handleSignOut() {
               </template>
             </BreadcrumbList>
           </Breadcrumb>
-          <DarkModeToggle class="ml-auto" variant="ghost"/>
+
+          <div class="ml-auto flex gap-4 justify-center align-center">
+            <Popover>
+              <PopoverTrigger as-child>
+                <Button variant="outline">
+                  Predict Trash Level
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent class="w-80">
+                <div class="grid gap-4">
+                  <div class="space-y-2">
+                    <h4 class="font-medium leading-none">
+                      Predictor
+                    </h4>
+                    <p class="text-sm text-muted-foreground">
+                      Predict the trash level and when it will be full.
+                    </p>
+                  </div>
+                  <div class="grid gap-2">
+                    <div class="grid grid-cols-3 items-center gap-4">
+                      <Label for="width">Sensor ID</Label>
+                      <Input
+                        id="sensor_id"
+                        type="number"
+                        default-value="1"
+                        v-model="predictSensorId"
+                        class="col-span-2 h-8"
+                      />
+                    </div>
+                    <Button class="mt-4" @click="getPredictionValue">Submit</Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+            <Separator orientation="vertical" class="h-9"/>
+            <DarkModeToggle variant="ghost"/>
+          </div>
         </div>
       </header>
       <div class="flex flex-1 flex-col gap-4 p-4 pt-0">

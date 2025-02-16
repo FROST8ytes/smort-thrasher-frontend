@@ -29,12 +29,12 @@ export default defineNuxtConfig({
       firestore: true,
     },
     config: {
-      apiKey: process.env.FIREBASE_API_KEY,
-      authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-      messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-      appId: process.env.FIREBASE_APP_ID,
+      apiKey: "AIzaSyDjn-bmrNEja2xU_ZXEE87T9dN-kalWMsw",
+      authDomain: "smort-thrasher.firebaseapp.com",
+      projectId: "smort-thrasher",
+      storageBucket: "smort-thrasher.firebasestorage.app",
+      messagingSenderId: "551880187815",
+      appId: "1:551880187815:web:937503e89178a2205c6082",
     },
     // appCheck: {
     //   debug: process.env.NODE_ENV !== "production",
