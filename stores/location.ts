@@ -1,11 +1,11 @@
-import { defineStore } from "pinia";
+import {defineStore} from "pinia";
 
 export const useLocationStore = defineStore("location", () => {
-  const activeLocationId = ref<string | null>(null);
+  const activeLocationId = ref<number | null>(null);
 
-  function setActiveLocationId(id: string) {
+  function setActiveLocationId(id: number) {
     activeLocationId.value = id;
   }
 
-  return { activeLocationId, setActiveLocationId };
+  return {activeLocationId, setActiveLocationId};
 });

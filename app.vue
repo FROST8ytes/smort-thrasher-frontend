@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useToast } from "@/components/ui/toast/use-toast";
+import {useToast} from "@/components/ui/toast/use-toast";
 
 const router = useRouter();
 const route = useRoute();
 const user = useCurrentUser();
 
-const { toast } = useToast();
+const {toast} = useToast();
 
 onMounted(() => {
   watch(user, (user, prevUser) => {
@@ -29,8 +29,9 @@ onMounted(() => {
 </script>
 
 <template>
+  <NuxtLoadingIndicator/>
   <NuxtLayout>
-    <NuxtPage />
+    <NuxtPage/>
   </NuxtLayout>
-  <Toaster />
+  <Toaster/>
 </template>

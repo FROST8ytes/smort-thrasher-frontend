@@ -1,107 +1,138 @@
 <script setup lang="ts">
-import {useId} from "vue";
+import {useLocationStore} from "@/stores/location";
+import {storeToRefs} from "pinia";
 
 definePageMeta({
   middleware: ["auth"],
 });
 
+const locationStore = useLocationStore();
+const {activeLocationId: activeLocation} = storeToRefs(locationStore);
+
+const regionId = ref(1);
 const id = useId();
 
-const mapRef = useMapboxRef(id);
-const colorMode = useColorMode();
-const color = computed(() => colorMode.value);
+const {
+  data: bins,
+  refresh: binRefresh
+} = await useFetch(() => `http://45.118.132.167/region/${regionId.value}/sensors`);
 
-const mapStyle = computed(() => {
-  if (color.value === "light") {
-    return "navigation-day-v1";
-  } else {
-    return "navigation-night-v1";
+// const {
+//   data: latestTrashLevelInRegion,
+//   refresh: refreshLatestTrashLevelInRegion
+// } = await useFetch(() => `http://45.118.132.167/analytics/level/${regionId.value}`);
+//
+// const {
+//   data: averageTrashLevelsInAllRegion
+// } = await useFetch(() => `http://45.118.132.167/analytics/average/all`);
+//
+// const {
+//   data: averageTrashLevelsInRegion,
+//   refresh: refreshAverageTrashLevelsInRegion
+// } = await useFetch(() => `http://45.118.132.167/analytics/average/${regionId.value}`);
+
+const pieChartData = [
+  {
+    id: 1,
+    "Trash Level": 42,
+    Predicted: 46
+  },
+  {
+    id: 2,
+    "Trash Level": 34,
+    Predicted: 65
+  },
+  {
+    id: 3,
+    "Trash Level": 74,
+    Predicted: 44
+  },
+  {
+    id: 4,
+    "Trash Level": 66,
+    Predicted: 31
+  },
+  {
+    id: 5,
+    "Trash Level": 63,
+    Predicted: 32
+  },
+]
+
+watch(activeLocation, async (id) => {
+  if (id !== null) {
+    regionId.value = id;
+    await binRefresh();
+    // await refreshLatestTrashLevelInRegion();
+    // await refreshAverageTrashLevelsInRegion();
   }
-});
-const center: Ref<[number, number]> = ref([100.969551, 4.382069]);
+}, {immediate: true});
 
-const data = [
+const areaChartData = [
   {
-    name: 'Jan',
-    total: Math.floor(Math.random() * 2000) + 500,
-    predicted: Math.floor(Math.random() * 2000) + 500
+    timestamp: "2025-02-14T07:00:00",
+    "In Region": 46,
+    "All Regions": 87
   },
   {
-    name: 'Feb',
-    total: Math.floor(Math.random() * 2000) + 500,
-    predicted: Math.floor(Math.random() * 2000) + 500
+    timestamp: "2025-02-14T14:00:00",
+    "In Region": 32,
+    "All Regions": 65
   },
   {
-    name: 'Mar',
-    total: Math.floor(Math.random() * 2000) + 500,
-    predicted: Math.floor(Math.random() * 2000) + 500
+    timestamp: "2025-02-15T07:00:00",
+    "In Region": 57,
+    "All Regions": 11
   },
   {
-    name: 'Apr',
-    total: Math.floor(Math.random() * 2000) + 500,
-    predicted: Math.floor(Math.random() * 2000) + 500
+    timestamp: "2025-02-15T14:00:00",
+    "In Region": 74,
+    "All Regions": 32
   },
   {
-    name: 'May',
-    total: Math.floor(Math.random() * 2000) + 500,
-    predicted: Math.floor(Math.random() * 2000) + 500
+    timestamp: "2025-02-16T07:00:00",
+    "In Region": 69,
+    "All Regions": 24
   },
   {
-    name: 'Jun',
-    total: Math.floor(Math.random() * 2000) + 500,
-    predicted: Math.floor(Math.random() * 2000) + 500
+    timestamp: "2025-02-16T14:00:00",
+    "In Region": 8,
+    "All Regions": 43
   },
 ];
-
-watch(color, () => {
-  const currCenter = mapRef.value?.getCenter();
-  if (currCenter) {
-    center.value[0] = currCenter.lng;
-    center.value[1] = currCenter.lat;
-  }
-});
 </script>
 
 <template>
   <div class="grid auto-rows-min gap-4 md:grid-cols-3">
     <Card class="aspect-video rounded-xl bg-muted/50">
       <CardHeader>
-        <CardTitle>Deez Nuts</CardTitle>
+        <CardTitle>Status of Trash Bins in the Area</CardTitle>
       </CardHeader>
       <CardContent>
         <DonutChart
-          index="name"
-          :category="'total'"
-          :data="data"
+          index="id"
+          :category="'Trash Level'"
+          :data="pieChartData"
           class="md:max-h-[250px]"
         />
       </CardContent>
     </Card>
     <Card class="aspect-[32/9] rounded-xl bg-muted/50 col-span-2">
       <CardHeader>
-        <CardTitle>Deez Nuts</CardTitle>
+        <CardTitle>Average Trash Level VS All Areas</CardTitle>
       </CardHeader>
       <CardContent>
         <AreaChart
-          index="name"
-          :data="data"
-          :categories="['total', 'predicted']"
+          index="timestamp"
+          :data="areaChartData"
+          :categories="['In Region', 'All Regions']"
           class="md:h-48 md:max-h-[250px] pb-4"
         />
       </CardContent>
     </Card>
   </div>
-  <!--  <div class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min"/>-->
-  <MapboxMap
-    :map-id="id"
-    class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min"
-    :options="{
-      style: `mapbox://styles/mapbox/${mapStyle}`,
-      center: center,
-      zoom: 16,
-    }"
-  >
-    <MapboxGeolocateControl position="top-left"/>
-    <MapboxFullscreenControl/>
-  </MapboxMap>
+  <Map class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" show-controls>
+    <MapboxDefaultMarker v-for="(bin) in bins" :marker-id="`${bin[0]}-${id}`" :options="{}"
+                         :lnglat="[bin[2], bin[1]]"/>
+  </Map>
 </template>
