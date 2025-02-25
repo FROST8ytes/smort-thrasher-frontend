@@ -18,13 +18,13 @@ onMounted(() => {
     }
   });
 
-  if (process.env.NODE_ENV !== "production") {
-    toast({
-      title: "DEVELOPMENT MODE",
-      description: "Be careful with the API calls!",
-      variant: "destructive",
-    });
-  }
+  // if (process.env.NODE_ENV !== "production") {
+  //   toast({
+  //     title: "DEVELOPMENT MODE",
+  //     description: "Be careful with the API calls!",
+  //     variant: "destructive",
+  //   });
+  // }
 });
 </script>
 
