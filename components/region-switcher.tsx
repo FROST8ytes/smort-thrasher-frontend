@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import {
   ChevronsUpDown,
   GalleryVerticalEnd,
@@ -23,54 +22,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useRegionContext } from "@/lib/region-context";
 
 export function RegionSwitcher() {
   const { isMobile } = useSidebar();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [regions, setRegions] = useState<
-    {
-      id: number;
-      name: string;
-      state: string;
-      emblem_url: string | null;
-    }[]
-  >([]);
-  const [activeRegion, setActiveRegion] = useState<{
-    id: number;
-    name: string;
-    state: string;
-    emblem_url: string | null;
-  } | null>(null);
+  const { regions, activeRegion, setActiveRegion, isLoading, error } =
+    useRegionContext();
 
-  useEffect(() => {
-    const fetchRegions = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_REST_API}/region/`
-        );
-
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setRegions(data);
-
-        if (data.length > 0) {
-          setActiveRegion(data[0]);
-        }
-      } catch (err) {
-        console.error("Failed to fetch regions:", err);
-        setError("Failed to load regions");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchRegions();
-  }, []);
   if (isLoading) {
     return (
       <SidebarMenu>
@@ -108,7 +66,7 @@ export function RegionSwitcher() {
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 {activeRegion.emblem_url ? (
                   <img
-                    src={activeRegion.emblem_url!}
+                    src={activeRegion.emblem_url}
                     className="size-4"
                     alt={`${activeRegion.name} emblem`}
                   />
@@ -136,14 +94,14 @@ export function RegionSwitcher() {
             </DropdownMenuLabel>
             {regions.map((region, index) => (
               <DropdownMenuItem
-                key={region.name}
+                key={region.id}
                 onClick={() => setActiveRegion(region)}
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">
                   {region.emblem_url ? (
                     <img
-                      src={region.emblem_url!}
+                      src={region.emblem_url}
                       className="size-4 shrink-0"
                       alt={`${region.name} emblem`}
                     />
