@@ -87,7 +87,7 @@ export default function CostSavingChart() {
                                   {entry.dataKey === "before"
                                     ? "Before"
                                     : "After"}
-                                  : ${entry.value}
+                                  : RM {entry.value}
                                 </span>
                               </div>
                             ))}
@@ -95,7 +95,7 @@ export default function CostSavingChart() {
                               <div className="flex items-center gap-1 mt-1 pt-1 border-t border-gray-700">
                                 <div className="h-2 w-2 rounded-full bg-blue-500" />
                                 <span className="text-xs text-muted-foreground">
-                                  Saving: $
+                                  Saving: RM{" "}
                                   {(payload[0].value as number) -
                                     (payload[1].value as number)}
                                 </span>
@@ -126,7 +126,7 @@ export default function CostSavingChart() {
           <div className="flex items-center gap-1">
             <div className="h-3 w-3 rounded-full bg-blue-500" />
             <span className="text-xs">
-              Savings: $
+              Savings: RM{" "}
               {data.reduce((acc, item) => acc + (item.before - item.after), 0)}
             </span>
           </div>

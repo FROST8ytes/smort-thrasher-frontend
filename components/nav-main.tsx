@@ -175,7 +175,7 @@ export function NavMain() {
                       cityWithSensorsMap[city.id].map((sensor) => (
                         <SidebarMenuSubItem key={sensor.id}>
                           <SidebarMenuSubButton asChild>
-                            <a href={`/sensor/${sensor.id}`}>
+                            <a href={`/dashboard/sensor/${sensor.id}`}>
                               <Thermometer className="h-3 w-3 mr-2" />
                               <span>{sensor.name}</span>
                             </a>
